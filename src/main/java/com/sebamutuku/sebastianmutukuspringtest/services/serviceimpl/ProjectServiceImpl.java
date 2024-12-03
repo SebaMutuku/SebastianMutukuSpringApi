@@ -57,7 +57,7 @@ public class ProjectServiceImpl extends ProjectService {
                         response.setResponseId(response.getRequestId());
                         response.setStatusCode(HttpStatus.ALREADY_REPORTED.value());
                         response.setExtraData(new LinkedList<>());
-                        response.setStatusDescription("Found existing project with id [" + existingProject.get().getId() + "]");
+                        response.setStatusDescription("Found existing project with id [" + existingProject.get().getProjectId() + "]");
                         log.info("Response [{}]", response);
                         return new ResponseEntity<>(response, HttpStatus.ALREADY_REPORTED);
                     }
@@ -68,7 +68,7 @@ public class ProjectServiceImpl extends ProjectService {
                     response.setResponseId(response.getRequestId());
                     response.setStatusCode(HttpStatus.OK.value());
                     response.setExtraData(new LinkedList<>());
-                    response.setStatusDescription("Successfully project  Id [" + project.getId() + "]");
+                    response.setStatusDescription("Successfully project  Id [" + project.getProjectId() + "]");
                     log.info("Response [{}]", response);
                     return new ResponseEntity<>(response, HttpStatus.OK);
 
@@ -103,7 +103,7 @@ public class ProjectServiceImpl extends ProjectService {
         log.info("received request [{}]", projectId);
         try {
             if (projectId != null) {
-                Optional<Project> exitingProject = projectRepo.findById(projectId);
+                Optional<Project> exitingProject = projectRepo.findByProjectId(projectId);
                 if (exitingProject.isPresent()) {
                     exitingProject.map(project -> ProjectResponse.builder().name(project.getName()).description(project.getDescription()).build()).get();
                     response.setResponseId(UUID.randomUUID().toString());
@@ -153,7 +153,7 @@ public class ProjectServiceImpl extends ProjectService {
             if (request != null) {
                 TaskRequest taskRequest = request.getData();
                 if (taskRequest != null) {
-                    Optional<Project> existingTask = projectRepo.findById(projectId);
+                    Optional<Project> existingTask = projectRepo.findByProjectId(projectId);
                     if (existingTask.isPresent()) {
                         TaskResponse taskResponse = existingTask.map(project -> TaskResponse.builder().build()).get();
                         response.setData(taskResponse);
@@ -161,11 +161,11 @@ public class ProjectServiceImpl extends ProjectService {
                         response.setResponseId(response.getRequestId());
                         response.setStatusCode(HttpStatus.ALREADY_REPORTED.value());
                         response.setExtraData(new LinkedList<>());
-                        response.setStatusDescription("Found existing task with id [" + existingTask.get().getId() + "]");
+                        response.setStatusDescription("Found existing task with id [" + existingTask.get().getProjectId() + "]");
                         log.info("Response [{}]", response);
                         return new ResponseEntity<>(response, HttpStatus.ALREADY_REPORTED);
                     }
-                    Task task = Task.builder().project(projectRepo.findById(projectId).get()).title(taskRequest.getTitle()).dueDate(taskRequest.getDueDate()).description(taskRequest.getDescription()).build();
+                    Task task = Task.builder().project(projectRepo.findByProjectId(projectId).get()).title(taskRequest.getTitle()).dueDate(taskRequest.getDueDate()).description(taskRequest.getDescription()).build();
                     taskRepo.save(task);
                     response.setData(null);
                     response.setResponseId(UUID.randomUUID().toString());
@@ -219,7 +219,7 @@ public class ProjectServiceImpl extends ProjectService {
     public ResponseEntity<BaseResponse<Page<TaskResponse>>> fetchProjectTasks(Pageable pageable, String projectId, String status, Date dueDate) {
         List<TaskResponse> listOfTasks = new LinkedList<>();
         BaseResponse<Page<TaskResponse>> response = new BaseResponse<>();
-        Page<Task> tasks = taskRepo.findByProjectIdAndFilters(UUID.fromString(projectId), status, dueDate, pageable);
+        Page<Task> tasks = taskRepo.findByProjectIdAndFilters(projectId, status, dueDate, pageable);
         tasks.forEach(task -> listOfTasks.add(TaskResponse.builder().title(task.getTitle()).description(task.getDescription()).dueDate(task.getDueDate()).status(task.getStatus().name()).build()));
         Page<TaskResponse> pagedTasks = Utils.pageData(listOfTasks, pageable);
         response.setData(pagedTasks);
@@ -235,13 +235,13 @@ public class ProjectServiceImpl extends ProjectService {
     public ResponseEntity<BaseResponse<Page<ProjectSummaryResponse>>> getProjectSummary(Pageable pageable) {
         List<Project> projects = projectRepo.findAll();
         List<ProjectSummaryResponse> projectSummaryResponses = projects.stream().map(project -> {
-            List<Task> tasks = taskRepo.findByProjectId(project.getId());
+            List<Task> tasks = taskRepo.findByProject(project);
             Map<String, Long> taskCountByStatus = new HashMap<>();
             tasks.forEach(task -> {
                 taskCountByStatus.merge(task.getStatus().name(), 1L, Long::sum);
             });
 
-            return new ProjectSummaryResponse(project.getId().toString(), project.getName(), taskCountByStatus);
+            return new ProjectSummaryResponse(project.getProjectId().toString(), project.getName(), taskCountByStatus);
         }).toList();
         BaseResponse<Page<ProjectSummaryResponse>> response = new BaseResponse<>();
         Page<ProjectSummaryResponse> pagedProjects = Utils.pageData(projectSummaryResponses, pageable);

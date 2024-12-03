@@ -45,7 +45,7 @@ class TaskControllerTest {
         TaskRequest taskRequest = new TaskRequest();
         taskRequest.setDescription("The characteristics of someone or something");
         taskRequest.setDueDate(Date.from(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant()));
-        taskRequest.setProjectId(UUID.randomUUID());
+        taskRequest.setProjectId(UUID.randomUUID().toString());
         taskRequest.setStatus(TaskRequest.Status.TO_DO);
         taskRequest.setTitle("Dr");
         BaseRequest.BaseRequestBuilder<TaskRequest> builderResult = BaseRequest.builder();

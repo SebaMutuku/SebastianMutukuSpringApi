@@ -12,7 +12,7 @@ import lombok.ToString;
 @ToString
 public class TaskRequest {
     @NotNull(message = "Project ID is required")
-    private UUID projectId;
+    private String projectId;
 
     @NotNull(message = "Title cannot be null")
     @NotEmpty(message = "Title must be between 1 and 255 characters")
