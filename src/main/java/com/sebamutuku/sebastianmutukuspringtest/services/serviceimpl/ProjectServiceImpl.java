@@ -146,7 +146,58 @@ public class ProjectServiceImpl extends ProjectService {
 
     @Override
     public ResponseEntity<BaseResponse<TaskResponse>> addTasks(BaseRequest<TaskRequest> request, String projectId) {
-        return null;
+        log.info("received request [{}]", request);
+        BaseResponse<TaskResponse> response = new BaseResponse<>();
+        log.info("received request [{}]", request);
+        try {
+            if (request != null) {
+                TaskRequest taskRequest = request.getData();
+                if (taskRequest != null) {
+                    Optional<Project> existingTask = projectRepo.findById(projectId);
+                    if (existingTask.isPresent()) {
+                        TaskResponse taskResponse = existingTask.map(project -> TaskResponse.builder().build()).get();
+                        response.setData(taskResponse);
+                        response.setResponseId(UUID.randomUUID().toString());
+                        response.setResponseId(response.getRequestId());
+                        response.setStatusCode(HttpStatus.ALREADY_REPORTED.value());
+                        response.setExtraData(new LinkedList<>());
+                        response.setStatusDescription("Found existing task with id [" + existingTask.get().getId() + "]");
+                        log.info("Response [{}]", response);
+                        return new ResponseEntity<>(response, HttpStatus.ALREADY_REPORTED);
+                    }
+                    Task task = Task.builder().project(projectRepo.findById(projectId).get()).title(taskRequest.getTitle()).dueDate(taskRequest.getDueDate()).description(taskRequest.getDescription()).build();
+                    taskRepo.save(task);
+                    response.setData(null);
+                    response.setResponseId(UUID.randomUUID().toString());
+                    response.setResponseId(response.getRequestId());
+                    response.setStatusCode(HttpStatus.OK.value());
+                    response.setExtraData(new LinkedList<>());
+                    response.setStatusDescription("Successfully project  Id [" + task.getId() + "]");
+                    log.info("Response [{}]", response);
+                    return new ResponseEntity<>(response, HttpStatus.OK);
+
+                }
+            }
+            response.setData(null);
+            response.setResponseId(UUID.randomUUID().toString());
+            response.setResponseId(response.getRequestId());
+            response.setStatusCode(HttpStatus.BAD_REQUEST.value());
+            response.setExtraData(new LinkedList<>());
+            response.setStatusDescription("Failed");
+            response.setError(List.of(new com.sebamutuku.sebastianmutukuspringtest.dto.responses.Error(HttpStatus.BAD_REQUEST.value(), "Failed ")));
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+
+        } catch (Exception e) {
+            response.setData(null);
+            response.setResponseId(UUID.randomUUID().toString());
+            response.setResponseId(response.getRequestId());
+            response.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setExtraData(new LinkedList<>());
+            response.setStatusDescription("Failed with error [" + e.getMessage() + "]");
+            response.setError(List.of(new com.sebamutuku.sebastianmutukuspringtest.dto.responses.Error(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Failed ")));
+            log.error("Response [{}]", response);
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Override
