@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  spring-boot-app:
+    image: openjdk:17-jdk-slim
+    container_name: sebamutuku-spring-app
+    ports:
+      - "8081:8081"
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: ["./mvnw", "spring-boot:run"]
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_DATASOURCE_URL=jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+      - SPRING_DATASOURCE_DRIVER_CLASSNAME=org.h2.Driver
+      - SPRING_DATASOURCE_USERNAME=sa
+      - SPRING_DATASOURCE_PASSWORD=password
+    depends_on:
+      - h2-db
+  h2-db:
+    image: oscarfonts/h2
+    container_name: sebamutuku-h2-db
+    ports:
+      - "9092:9092"
+    environment:
+      - H2_OPTIONS=-ifNotExists
+    volumes:
+      - h2-data:/opt/h2-data
+
+  swagger-ui:
+    image: swaggerapi/swagger-ui
+    container_name: swagger-ui
+    ports:
+      - "8081:8081"
+    environment:
+      - SWAGGER_JSON=http://spring-boot-app:8080/v3/api-docs
+volumes:
+  h2-data:
+    driver: local
