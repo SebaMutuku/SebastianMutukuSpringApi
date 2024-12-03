@@ -36,6 +36,7 @@ public class GlobalException {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
     public ResponseEntity<BaseResponse<?>> handleOtherExceptions(Exception ex) {
+        ex.printStackTrace();
         log.error(ex.getMessage(), ex);
         BaseResponse<?> response = new BaseResponse<>();
         response.setData(null);
@@ -46,6 +47,5 @@ public class GlobalException {
         response.setStatusDescription("Failed with errors [" + ex.getMessage() + "]");
         response.setError(List.of(new com.sebamutuku.sebastianmutukuspringtest.dto.responses.Error(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Failed with error  [" + ex + "]")));
         return ResponseEntity.internalServerError().body(response);
-
     }
 }
