@@ -54,30 +54,3 @@ Example Request:
     "description": "This is a description of the new project."
   }
 } ```
-
-
-2. Fetch All Projects
-URL: /api/v1/projects/findAll
-Method: GET
-Request Params: Pagination (page, size)
-Response: Returns a paginated list of all projects.
-3. Get Project Details by ID
-URL: /api/v1/projects/{projectId}
-Method: GET
-Request Params: projectId (path variable)
-Response: Returns the details of a specific project by its ID.
-4. Add Tasks to Project
-URL: /api/v1/projects/{projectId}/tasks
-Method: POST
-Request Body: Task details (title, description, etc.)
-Response: Returns the created task details.
-5. Fetch Tasks by Project ID
-URL: /api/v1/projects/{projectId}/tasks
-Method: GET
-Request Params: status, dueDate (optional), Pagination (page, size)
-Response: Returns a paginated list of tasks associated with a project.
-6. Project Summary
-URL: /api/v1/projects/projects/summary
-Method: GET
-Request Params: Pagination (page, size)
-Response: Returns a paginated summary of all projects with a count of tasks grouped by status.
