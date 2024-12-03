@@ -38,7 +38,7 @@ public class TaskServiceImpl extends TaskService {
             if (request != null) {
                 TaskRequest taskRequest = request.getData();
                 if (taskRequest != null) {
-                    Optional<Task> existingTask = taskRepo.findById(taskId);
+                    Optional<Task> existingTask = taskRepo.findById(UUID.fromString(taskId));
                     if (existingTask.isPresent()) {
                         Task task = existingTask.get();
                         task.setDescription(taskRequest.getDescription());
@@ -94,7 +94,7 @@ public class TaskServiceImpl extends TaskService {
     public ResponseEntity<BaseResponse<Void>> deletedById(String taskId) {
         BaseResponse<Void> response = new BaseResponse<>();
         log.info("received request [{}]", taskId);
-        Optional<Task> existingTask = taskRepo.findById(taskId);
+        Optional<Task> existingTask = taskRepo.findById(UUID.fromString(taskId));
         if (existingTask.isPresent()) {
             taskRepo.delete(existingTask.get());
             response.setResponseId(UUID.randomUUID().toString());

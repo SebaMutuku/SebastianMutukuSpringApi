@@ -8,6 +8,7 @@ import com.sebamutuku.sebastianmutukuspringtest.dto.responses.ProjectResponse;
 import com.sebamutuku.sebastianmutukuspringtest.dto.responses.ProjectSummaryResponse;
 import com.sebamutuku.sebastianmutukuspringtest.dto.responses.TaskResponse;
 import com.sebamutuku.sebastianmutukuspringtest.services.ProjectService;
+import com.sebamutuku.sebastianmutukuspringtest.services.serviceimpl.ProjectServiceImpl;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -30,7 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProjectController {
     private final ProjectService projectService;
 
-    public ProjectController(ProjectService projectService) {
+    public ProjectController(ProjectServiceImpl projectService) {
         this.projectService = projectService;
     }
 
