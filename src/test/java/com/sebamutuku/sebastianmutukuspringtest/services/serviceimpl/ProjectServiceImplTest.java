@@ -54,7 +54,7 @@ class ProjectServiceImplTest {
         ResponseEntity<BaseResponse<ProjectResponse>> response = projectService.findByProjectId(projectId);
 
         assertNotNull(response);
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(200, response.getStatusCode().value());
         assertEquals("Success", response.getBody().getStatusDescription());
     }
 
@@ -67,7 +67,7 @@ class ProjectServiceImplTest {
         ResponseEntity<BaseResponse<ProjectResponse>> response = projectService.findByProjectId(projectId);
 
         assertNotNull(response);
-        assertEquals(404, response.getStatusCodeValue());
+        assertEquals(404, response.getStatusCode().value());
         assertEquals("Project with id [" + projectId + "] does not exist", response.getBody().getStatusDescription());
     }
 
@@ -87,7 +87,7 @@ class ProjectServiceImplTest {
         ResponseEntity<BaseResponse<Page<ProjectResponse>>> response = projectService.getAll(PageRequest.of(0, 10));
 
         assertNotNull(response);
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(200, response.getStatusCode().value());
         assertEquals(2, response.getBody().getData().getTotalElements());
     }
 }
